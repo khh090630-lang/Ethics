@@ -1202,7 +1202,6 @@ function drawFieldKernel(w, h) {
   const desire = state.desire ?? (state.inwi ?? 20);
   const order = state.normOrder ?? (state.waterFlow ?? 80);
 
-  // 도가 인위(장벽) 또는 순자 예(격자 가이드) 표시
   if (isDao && desire > 25) {
     ctx.strokeStyle = "rgba(248, 113, 113, 0.55)";
     ctx.lineWidth = 3;
@@ -1227,7 +1226,6 @@ function drawFieldKernel(w, h) {
   let collisions = 0;
   particles.forEach((p, idx) => {
     if (isDao) {
-      // 상선약수 물결 흐름 vs 인위 충돌
       const streamY = h * 0.5 + Math.sin((p.x * 0.012) + animTick * 0.04) * 55;
       p.vx = 2.0 + (order / 50);
       p.vy += ((streamY - p.y) * 0.02 * (order / 100)) + ((Math.random() - 0.5) * (desire / 25));
@@ -1238,7 +1236,6 @@ function drawFieldKernel(w, h) {
       const jitter = (desire / 100) * 3.2 * (1 - (order / 130));
       p.vx += (Math.random() - 0.5) * jitter;
       p.vy += (Math.random() - 0.5) * jitter;
-      // 예(화성기위) 격자 정렬 인력
       if (order > 50) {
         const gx = 80 + (idx % 8) * ((w - 160) / 7);
         const gy = 120 + Math.floor(idx / 8) * ((h - 220) / 6);
@@ -1251,18 +1248,15 @@ function drawFieldKernel(w, h) {
       p.y = Math.max(80, Math.min(h - 80, p.y + p.vy));
     }
 
-    // 충돌 계산
     for (let j = idx + 1; j < particles.length; j++) {
       const q = particles[j];
       const dx = p.x - q.x, dy = p.y - q.y;
       if (dx * dx + dy * dy < 320 && desire > 45 && order < 70) collisions++;
     }
 
-    // 입자 렌더링 (성선=초록 원 광채, 화성기위=하늘색 육각형, 욕망=붉은 입자)
     ctx.save();
     ctx.translate(p.x, p.y);
     if (order > 65 && good < 20) {
-      // 순자 화성기위: 후천적 예로 다듬어진 정육각형
       ctx.strokeStyle = "#38bdf8";
       ctx.fillStyle = "rgba(56, 189, 248, 0.35)";
       ctx.lineWidth = 2;
@@ -1286,7 +1280,7 @@ function drawFieldKernel(w, h) {
         ctx.shadowColor = "#4ade80";
         ctx.shadowBlur = 12;
       } else if (good >= 35) {
-        ctx.fillStyle = "#cbd5e1"; // 백지설
+        ctx.fillStyle = "#cbd5e1";
       } else {
         ctx.fillStyle = "#f87171";
       }
@@ -1308,21 +1302,6 @@ function drawNetworkKernel(w, h) {
   const isBuddha = currentItem.id === "buddhism";
 
   if (!isBuddha) {
-    // 공자: 동심원 인(仁) 확장 + 정명
-    const radius = (state.renRadius / 100) * Math.min(w, h) * 0.42;
-    const rings = [
-      { r: 0.28, label: "가족 (효제: 인의 출발)" },
-      { r: 0.62, label: "이웃·향당 (충서·극기복례)" },
-      { r: 0.95, label: "천하·대동사회 (수기안인)" }
-    ];
-    rings.
-// [커널 2: network] 공자 인의 확장 & 불교 연기법(인드라망)
-function drawNetworkKernel(w, h) {
-  const cx = w * 0.5, cy = h * 0.5;
-  const isBuddha = currentItem.id === "buddhism";
-
-  if (!isBuddha) {
-    // 공자: 동심원 인(仁) 확장 + 정명
     const radius = (state.renRadius / 100) * Math.min(w, h) * 0.42;
     const rings = [
       { r: 0.28, label: "가족 (효제: 인의 출발)" },
@@ -1342,7 +1321,6 @@ function drawNetworkKernel(w, h) {
       ctx.fillText(rg.label, cx - 65, cy - rr + 16);
     });
 
-    // 중심 노드 (수기/군자)
     ctx.beginPath();
     ctx.arc(cx, cy, 18, 0, Math.PI * 2);
     ctx.fillStyle = "#38bdf8";
@@ -1352,7 +1330,6 @@ function drawNetworkKernel(w, h) {
     ctx.textAlign = "center";
     ctx.fillText("나(修己)", cx, cy + 4);
 
-    // 주변 구성원 노드 (정명 역할 배치)
     const roles = ["군(君)", "신(臣)", "부(父)", "자(子)", "형(兄)", "제(弟)", "붕우", "약자", "이웃", "백성", "타인", "만민"];
     roles.forEach((role, i) => {
       const tier = i < 4 ? 0.28 : (i < 8 ? 0.62 : 0.95);
@@ -1391,7 +1368,6 @@ function drawNetworkKernel(w, h) {
       { k: "사회 상태", v: state.renRadius > 80 && state.geukgi > 75 ? "대동사회(大同)" : "수양 진행 중", c: "#fbbf24" }
     ]);
   } else {
-    // 불교: 연기법(인드라망) 그물 & 삼독 vs 팔정도·열반적정
     const N = 16;
     const pts = [];
     const baseR = Math.min(w, h) * 0.34;
@@ -1406,7 +1382,6 @@ function drawNetworkKernel(w, h) {
       });
     }
 
-    // 연기(인연) 연결망
     for (let i = 0; i < N; i++) {
       for (let j = i + 1; j < N; j++) {
         if ((j - i) % 3 === 1 || (j - i) === 1) {
@@ -1420,7 +1395,6 @@ function drawNetworkKernel(w, h) {
       }
     }
 
-    // 자타불이·자비 파동
     const waveR = ((animTick * 1.5) % (baseR * 1.2)) * (state.jabi / 100);
     ctx.beginPath();
     ctx.arc(cx, cy, waveR, 0, Math.PI * 2);
@@ -1428,7 +1402,7 @@ function drawNetworkKernel(w, h) {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    pts.forEach((p, idx) => {
+    pts.forEach((p) => {
       ctx.beginPath();
       ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
       ctx.fillStyle = chaos > 0.35 ? "#f87171" : "#4ade80";
@@ -1463,7 +1437,6 @@ function drawCircuitKernel(w, h) {
     return { x: padX + c * stepX, y: padY + r * stepY, label };
   });
 
-  // 배선 및 신호 펄스
   for (let i = 0; i < coords.length - 1; i++) {
     const a = coords[i], b = coords[i + 1];
     ctx.beginPath();
@@ -1482,7 +1455,6 @@ function drawCircuitKernel(w, h) {
     ctx.fill();
   }
 
-  // 회로 노드 박스
   coords.forEach((nd, i) => {
     ctx.fillStyle = "#131b2e";
     ctx.strokeStyle = i % 2 === 0 ? "#38bdf8" : "#4ade80";
@@ -1540,7 +1512,6 @@ function drawUniversalKernel(w, h) {
     ctx.fillText(g.pass ? "PASS (통과)" : "BLOCK (위반)", gx, h * 0.77);
   });
 
-  // 준칙 입자 통과 애니메이션
   const pX = ((animTick * 3) % (w * 0.8)) + w * 0.1;
   let blockedX = w * 0.9;
   gates.forEach((g, idx) => {
@@ -1612,7 +1583,6 @@ function drawSpectrumKernel(w, h) {
   const emo = state.emotionLevel ?? 50;
   const isGolden = emo >= 40 && emo <= 60;
 
-  // 반원 아크 (모자람 - 중용 - 지나침)
   ctx.lineWidth = 22;
   ctx.beginPath();
   ctx.arc(cx, cy, r, Math.PI, Math.PI * 1.35);
@@ -1629,7 +1599,6 @@ function drawSpectrumKernel(w, h) {
   ctx.strokeStyle = "#fbbf24";
   ctx.stroke();
 
-  // 바늘
   const ang = Math.PI + (emo / 100) * Math.PI;
   ctx.beginPath();
   ctx.moveTo(cx, cy);
@@ -1681,7 +1650,6 @@ function drawVennKernel(w, h) {
     ctx.fillText(c.pass ? "✓ 정당화 승인" : "✕ 조건 미충족", c.x, c.y + (c.y < cy ? -R * 0.25 : R * 0.75));
   });
 
-  // 교집합 (처벌 수용 · 비폭력 · 공개성)
   ctx.fillStyle = "#fbbf24";
   ctx.font = "bold 12px sans-serif";
   ctx.fillText("★ 공통점: 처벌 수용", cx, cy + 4);
@@ -1701,7 +1669,6 @@ function drawScaleKernel(w, h) {
   const diff = ((state.rightWeight - state.leftWeight) / 100) * (1 - state.harmony / 150);
   const angle = diff * 0.38;
 
-  // 받침대 (공자 시·예·악 / 칸트 미는 도덕성의 상징)
   ctx.fillStyle = "#334155";
   ctx.beginPath();
   ctx.moveTo(cx, cy);
@@ -1714,7 +1681,6 @@ function drawScaleKernel(w, h) {
   ctx.translate(cx, cy);
   ctx.rotate(angle);
 
-  // 저울대
   ctx.strokeStyle = "#38bdf8";
   ctx.lineWidth = 6;
   ctx.beginPath();
@@ -1722,7 +1688,6 @@ function drawScaleKernel(w, h) {
   ctx.lineTo(beamW / 2, 0);
   ctx.stroke();
 
-  // 좌우 접시
   [
     { x: -beamW / 2, label: "도덕주의(플라톤·톨스토이·순자)", wVal: state.leftWeight, c: "#4ade80" },
     { x: beamW / 2, label: "예술지상주의(와일드·스핑건)", wVal: state.rightWeight, c: "#c084fc" }
@@ -1758,7 +1723,7 @@ function drawRippleKernel(w, h) {
     { r: maxR * 1.0, label: "미래 세대 존속 (요나스 예견적·비호혜적 책임)" }
   ];
 
-  zones.forEach((z, idx) => {
+  zones.forEach((z) => {
     ctx.beginPath();
     ctx.arc(cx, cy, z.r, 0, Math.PI * 2);
     ctx.strokeStyle = gapRisk > 35 ? "rgba(248, 113, 113, 0.55)" : "rgba(74, 222, 128, 0.5)";
@@ -1770,7 +1735,6 @@ function drawRippleKernel(w, h) {
     ctx.fillText(z.label, cx, cy - z.r + 16);
   });
 
-  // 기술 파동
   const wave = (animTick * (state.techSpeed / 25)) % maxR;
   ctx.beginPath();
   ctx.arc(cx, cy, wave, 0, Math.PI * 2);
@@ -1791,7 +1755,6 @@ function drawInfoKernel(w, h) {
   const shield = state.selfDeterm || 50;
   const surv = state.surveillance || 50;
 
-  // 중앙 AI 블랙박스 / 파놉티콘 감시탑
   ctx.fillStyle = "#1e293b";
   ctx.strokeStyle = surv > shield ? "#f87171" : "#38bdf8";
   ctx.lineWidth = 3;
@@ -1802,7 +1765,6 @@ function drawInfoKernel(w, h) {
   ctx.fillText("전자 파놉티콘", cx, cy - 6);
   ctx.fillText("& AI 블랙박스", cx, cy + 12);
 
-  // 정보 자기 결정권 방패 원
   ctx.beginPath();
   ctx.arc(cx, cy, 115, 0, Math.PI * 2);
   ctx.strokeStyle = `rgba(74, 222, 128, ${shield / 100})`;
@@ -1834,7 +1796,6 @@ function drawMarketKernel(w, h) {
   const cx = w * 0.5, cy = h * 0.52;
   const socialCap = Math.round((state.ethicalBuy + state.csrLevel - state.veblen * 0.5) / 1.5);
 
-  // 좌(소비자) - 중앙(사회적 자본) - 우(생산자 기업)
   const boxes = [
     { x: w * 0.23, y: cy, title: "소비자 (보이콧·바이콧)", sub: `윤리적 소비 ${state.ethicalBuy}%`, c: "#38bdf8" },
     { x: cx, y: cy, title: "사회적 자본 (신뢰·호혜)", sub: `형성도 ${Math.max(0, socialCap)}%`, c: "#4ade80" },
@@ -1875,18 +1836,16 @@ function drawMarketKernel(w, h) {
 // [커널 12: culture] 다문화 그릇(용광로·국수대접·샐러드볼) & 포퍼 관용의 역설
 function drawCultureKernel(w, h) {
   const cx = w * 0.5, cy = h * 0.55;
-  const bw = Math.min(w * 0.55, 360), bh = 160;
+  const bw = Math.min(w * 0.55, 360);
   const mode = state.bowlMode ?? 80;
   const paradox = state.tolerance >= 90 && state.universalNorm < 40;
 
-  // 그릇 외형
   ctx.beginPath();
   ctx.arc(cx, cy - 20, bw / 2, 0, Math.PI);
   ctx.strokeStyle = paradox ? "#f87171" : "#38bdf8";
   ctx.lineWidth = 5;
   ctx.stroke();
 
-  // 국수 대접(34~66)일 때 주류 문화(국수 면발) 배경
   if (mode >= 34 && mode <= 66) {
     ctx.strokeStyle = "rgba(251, 191, 36, 0.45)";
     ctx.lineWidth = 3;
@@ -1900,7 +1859,6 @@ function drawCultureKernel(w, h) {
     }
   }
 
-  // 문화 입자 렌더링
   const colors = ["#38bdf8", "#4ade80", "#fbbf24", "#c084fc"];
   particles.slice(0, 32).forEach((p, i) => {
     const ang = (i / 32) * Math.PI;
@@ -1910,7 +1868,6 @@ function drawCultureKernel(w, h) {
 
     ctx.beginPath();
     ctx.arc(px, py, mode >= 34 && mode <= 66 && i % 3 !== 0 ? 6 : 9, 0, Math.PI * 2);
-    // 용광로면 단일 색상으로 흡수, 샐러드볼이면 각자 고유 색상 유지
     ctx.fillStyle = mode < 34 ? "#38bdf8" : (paradox && i < 6 ? "#ef4444" : colors[i % 4]);
     ctx.fill();
   });
